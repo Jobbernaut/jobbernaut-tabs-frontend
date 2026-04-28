@@ -1,0 +1,32 @@
+name = "jobbernaut-srmanda-com"
+main = ".open-next/worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[observability]
+enabled = false
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = false
+persist = true
+head_sampling_rate = 1
+
+# Uncomment and configure when you add KV, R2, D1 bindings
+# [[kv_namespaces]]
+# binding = "MY_KV"
+# id = "xxx"
+
+# [[r2_buckets]]
+# binding = "ASSETS_BUCKET"
+# bucket_name = "jobbernaut-tabs-assets"
