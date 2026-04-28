@@ -17,6 +17,11 @@
 /.next/
 /out/
 
+# cloudflare workers build output
+/.worker-next/
+/.open-next/
+/.wrangler/
+
 # production
 /build
 
@@ -39,3 +44,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code
+/.claude/
