@@ -1,0 +1,50 @@
+[
+  {
+    "id": "CJCQ1Q3QK1",
+    "jobTitle": "Senior Full Stack Engineer",
+    "company": "Anthropic",
+    "location": "San Francisco, CA",
+    "jobPostingUrl": "https://anthropic.com/careers",
+    "jobDescription": "Work on core product infrastructure alongside researchers and engineers.",
+    "status": "Interviewing",
+    "dateApplied": "2026-05-20",
+    "applicationMaterials": "Resume, cover letter, GitHub portfolio.",
+    "notes": "Second round interview scheduled for next week."
+  },
+  {
+    "id": "CJCQ1Q3QK2",
+    "jobTitle": "Associate, Cloud DevOps",
+    "company": "KPMG US",
+    "location": "Raleigh, NC",
+    "jobPostingUrl": "https://www.linkedin.com/jobs/view/4363417472",
+    "jobDescription": "Develop and automate cloud solutions across Azure, GCP, and AWS using Infrastructure-as-Code and scripting for Windows and Linux environments.",
+    "status": "Applied",
+    "dateApplied": "2026-05-20",
+    "applicationMaterials": "Resume, cover letter.",
+    "notes": ""
+  },
+  {
+    "id": "CJCQ1Q3QK3",
+    "jobTitle": "Developer Experience Engineer",
+    "company": "Vercel",
+    "location": "Remote",
+    "jobPostingUrl": "https://vercel.com/careers",
+    "jobDescription": "Help developers ship faster by improving tooling and documentation.",
+    "status": "Offer",
+    "dateApplied": "2026-05-18",
+    "applicationMaterials": "Resume, portfolio, take-home project.",
+    "notes": "Offer received, reviewing compensation package."
+  },
+  {
+    "id": "CJCQ1Q3QK4",
+    "jobTitle": "Frontend Engineer",
+    "company": "Linear",
+    "location": "New York, NY",
+    "jobPostingUrl": "https://linear.app/careers",
+    "jobDescription": "Build beautiful, fast product interfaces used by engineering teams worldwide.",
+    "status": "Rejected",
+    "dateApplied": "2026-05-10",
+    "applicationMaterials": "Resume, cover letter.",
+    "notes": "No feedback provided."
+  }
+]
