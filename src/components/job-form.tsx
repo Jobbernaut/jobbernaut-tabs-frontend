@@ -84,7 +84,7 @@ export default function JobForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-zinc-800 border-zinc-700 text-white max-w-lg overflow-y-auto max-h-screen">
+      <DialogContent className="bg-zinc-800 border-zinc-700 text-white sm:max-w-3xl overflow-y-auto max-h-4/5">
         <DialogHeader>
           <DialogTitle className="text-white">
             {job ? "Edit Job" : "Add Job"}
