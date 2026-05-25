@@ -22,6 +22,11 @@ enabled = false
 persist = true
 head_sampling_rate = 1
 
+[vars]
+AUTH_COGNITO_ID = "7mie7eekl9csfobgtqggtflgbp"
+AUTH_COGNITO_ISSUER = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_gH2XpL8oM"
+NEXT_PUBLIC_API_BASE_URL = "https://qkue87n0d1.execute-api.us-east-1.amazonaws.com"
+
 # Uncomment and configure when you add KV, R2, D1 bindings
 # [[kv_namespaces]]
 # binding = "MY_KV"

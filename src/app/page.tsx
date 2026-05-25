@@ -6,15 +6,11 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-
-import { useRouter } from "next/navigation";
 import { FaLinkedin } from "react-icons/fa";
-
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 
 export default function Home() {
-  const router = useRouter();
-
   return (
     <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center px-6">
       <Card className="w-full max-w-sm bg-zinc-800 border-zinc-700">
@@ -46,7 +42,7 @@ export default function Home() {
 
         <CardFooter className="flex flex-col gap-4">
           <button
-            onClick={() => router.push("/dashboard")}
+            onClick={() => signIn("cognito", { callbackUrl: "/dashboard" })}
             className="flex items-center justify-center gap-3 w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors duration-200 shadow-md"
           >
             <FaLinkedin className="w-5 h-5" />
