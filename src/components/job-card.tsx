@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export type JobStatus =
+  | "Saved"
   | "Applied"
   | "Interviewing"
   | "Offer"
@@ -34,16 +35,20 @@ export type JobStatus =
   | "Archived";
 
 export interface Job {
+  pk?: string;
+  sk?: string;
   id: string;
-  jobTitle: string;
-  company: string;
+  statusHistory?: string[];
+  addedAt?: string;
+  updatedAt?: string;
+
+  title: string;
+  employer: string;
   location: string;
-  jobPostingUrl: string;
-  jobDescription?: string;
-  status: JobStatus;
-  dateApplied: string;
-  applicationMaterials?: string;
-  notes?: string;
+  applicationStatus: JobStatus;
+  postingLink: string;
+  description: string;
+  notes: string;
 }
 
 interface JobCardProps {
@@ -54,6 +59,7 @@ interface JobCardProps {
 }
 
 const statusStyles: Record<JobStatus, string> = {
+  Saved: "bg-zinc-600/20 text-zinc-400 border-zinc-500/30",
   Applied: "bg-blue-500/20 text-blue-400 border-blue-500/30",
   Interviewing: "bg-amber-500/20 text-amber-400 border-amber-500/30",
   Offer: "bg-green-500/20 text-green-400 border-green-500/30",
@@ -69,28 +75,39 @@ export default function JobCard({
 }: JobCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  // Fallback cleanly to current timestamp if addedAt is unavailable
+  const displayedDate = job.addedAt
+    ? new Date(job.addedAt).toLocaleDateString()
+    : new Date().toLocaleDateString();
+
   return (
     <>
       <Card className="bg-zinc-800 border-zinc-700 w-72">
         <CardHeader className="flex flex-row items-start justify-between gap-2 pb-2">
           <div className="flex flex-col gap-1">
-            <h2 className="text-white font-bold text-xl leading-tight">
-              {job.company}
+            <h2 className="text-white font-bold text-xl leading-tight truncate max-w-[180px]">
+              {job.employer}
             </h2>
-            <p className="text-zinc-400 text-sm">{job.jobTitle}</p>
+            <p className="text-zinc-400 text-sm truncate max-w-[180px]">
+              {job.title}
+            </p>
             <div className="flex items-center gap-1 mt-0.5">
               <MapPin className="w-3 h-3 text-zinc-500" />
-              <span className="text-zinc-500 text-xs">{job.location}</span>
+              <span className="text-zinc-500 text-xs truncate max-w-[160px]">
+                {job.location || "Remote"}
+              </span>
             </div>
           </div>
 
           <div className="flex items-center gap-1">
-            <button
-              className="h-8 w-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
-              onClick={() => window.open(job.jobPostingUrl, "_blank")}
-            >
-              <ExternalLink className="w-4 h-4" />
-            </button>
+            {job.postingLink && (
+              <button
+                className="h-8 w-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
+                onClick={() => window.open(job.postingLink, "_blank")}
+              >
+                <ExternalLink className="w-4 h-4" />
+              </button>
+            )}
 
             <DropdownMenu>
               <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors">
@@ -125,8 +142,10 @@ export default function JobCard({
         </CardHeader>
 
         <CardFooter className="flex items-center justify-between pt-0">
-          <Badge className={`text-xs font-medium ${statusStyles[job.status]}`}>
-            {job.status}
+          <Badge
+            className={`text-xs font-medium ${statusStyles[job.applicationStatus]}`}
+          >
+            {job.applicationStatus}
           </Badge>
           <Button
             size="sm"
@@ -143,61 +162,54 @@ export default function JobCard({
         <DialogContent className="bg-zinc-800 border-zinc-700 text-white max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
-              {job.company}
+              {job.employer}
             </DialogTitle>
-            <p className="text-zinc-400 text-sm">{job.jobTitle}</p>
+            <p className="text-zinc-400 text-sm">{job.title}</p>
             <div className="flex items-center gap-1">
               <MapPin className="w-3 h-3 text-zinc-500" />
-              <span className="text-zinc-500 text-xs">{job.location}</span>
+              <span className="text-zinc-500 text-xs">
+                {job.location || "Remote"}
+              </span>
             </div>
           </DialogHeader>
 
           <div className="flex items-center justify-between">
             <Badge
-              className={`text-xs font-medium ${statusStyles[job.status]}`}
+              className={`text-xs font-medium ${statusStyles[job.applicationStatus]}`}
             >
-              {job.status}
+              {job.applicationStatus}
             </Badge>
             <span className="text-zinc-500 text-xs">
-              Applied {new Date(job.dateApplied).toLocaleDateString()}
+              Tracked: {displayedDate}
             </span>
           </div>
 
           <div className="h-px bg-zinc-700" />
 
-          <div className="flex flex-col gap-5">
-            <div>
-              <h3 className="text-zinc-300 text-xs font-semibold uppercase tracking-wider mb-1.5">
-                Job Posting
-              </h3>
-              <a
-                href={job.jobPostingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 text-sm hover:underline break-all"
-              >
-                {job.jobPostingUrl}
-              </a>
-            </div>
+          <div className="flex flex-col gap-5 max-h-[50vh] overflow-y-auto pr-1">
+            {job.postingLink && (
+              <div>
+                <h3 className="text-zinc-300 text-xs font-semibold uppercase tracking-wider mb-1.5">
+                  Job Posting
+                </h3>
+                <a
+                  href={job.postingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 text-sm hover:underline break-all"
+                >
+                  {job.postingLink}
+                </a>
+              </div>
+            )}
 
-            {job.jobDescription && (
+            {job.description && (
               <div>
                 <h3 className="text-zinc-300 text-xs font-semibold uppercase tracking-wider mb-1.5">
                   Job Description
                 </h3>
-                <p className="text-zinc-400 text-sm leading-relaxed">
-                  {job.jobDescription}
-                </p>
-              </div>
-            )}
-
-            {job.applicationMaterials && (
-              <div>
-                <h3 className="text-zinc-300 text-xs font-semibold uppercase tracking-wider mb-1.5">
-                  Application Materials
-                </h3>
-                <p className="text-zinc-400 text-sm leading-relaxed">
-                  {job.applicationMaterials}
+                <p className="text-zinc-400 text-sm leading-relaxed whitespace-pre-wrap">
+                  {job.description}
                 </p>
               </div>
             )}
@@ -207,7 +219,7 @@ export default function JobCard({
                 <h3 className="text-zinc-300 text-xs font-semibold uppercase tracking-wider mb-1.5">
                   Notes
                 </h3>
-                <p className="text-zinc-400 text-sm leading-relaxed">
+                <p className="text-zinc-400 text-sm leading-relaxed whitespace-pre-wrap">
                   {job.notes}
                 </p>
               </div>

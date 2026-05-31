@@ -23,11 +23,12 @@ import { Job, JobStatus } from "@/components/job-card";
 interface JobFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (job: Job) => void;
+  onSubmit: (job: any) => Promise<void>;
   job?: Job;
 }
 
 const statusOptions: JobStatus[] = [
+  "Saved",
   "Applied",
   "Interviewing",
   "Offer",
@@ -36,14 +37,12 @@ const statusOptions: JobStatus[] = [
 ];
 
 const emptyForm = {
-  jobTitle: "",
-  company: "",
+  title: "",
+  employer: "",
   location: "",
-  jobPostingUrl: "",
-  jobDescription: "",
-  status: "Applied" as JobStatus,
-  dateApplied: new Date().toISOString().split("T")[0],
-  applicationMaterials: "",
+  postingLink: "",
+  description: "",
+  applicationStatus: "Applied" as JobStatus,
   notes: "",
 };
 
@@ -54,37 +53,43 @@ export default function JobForm({
   job,
 }: JobFormProps) {
   const [form, setForm] = useState(emptyForm);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (job) {
       setForm({
-        jobTitle: job.jobTitle,
-        company: job.company,
-        location: job.location,
-        jobPostingUrl: job.jobPostingUrl,
-        jobDescription: job.jobDescription ?? "",
-        status: job.status,
-        dateApplied: job.dateApplied,
-        applicationMaterials: job.applicationMaterials ?? "",
-        notes: job.notes ?? "",
+        title: job.title || "",
+        employer: job.employer || "",
+        location: job.location || "",
+        postingLink: job.postingLink || "",
+        description: job.description || "",
+        applicationStatus: job.applicationStatus || "Applied",
+        notes: job.notes || "",
       });
     } else {
       setForm(emptyForm);
     }
   }, [job, open]);
 
-  const handleSubmit = () => {
-    if (!form.company || !form.jobTitle || !form.jobPostingUrl) return;
-    onSubmit({
-      id: job?.id ?? crypto.randomUUID(),
-      ...form,
-    });
-    onOpenChange(false);
+  const handleSubmit = async () => {
+    if (!form.employer || !form.title) return;
+
+    setLoading(true);
+    try {
+      const structuralPayload = job ? { ...job, ...form } : { ...form };
+
+      await onSubmit(structuralPayload);
+      onOpenChange(false);
+    } catch (err) {
+      console.error("Mutation failure inside form submission wrapper:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-zinc-800 border-zinc-700 text-white sm:max-w-3xl overflow-y-auto max-h-4/5">
+      <DialogContent className="bg-zinc-800 border-zinc-700 text-white sm:max-w-3xl overflow-y-auto max-h-[80vh]">
         <DialogHeader>
           <DialogTitle className="text-white">
             {job ? "Edit Job" : "Add Job"}
@@ -94,13 +99,14 @@ export default function JobForm({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <Label className="text-zinc-300 text-xs font-semibold uppercase tracking-wider">
-              Company *
+              Company / Employer *
             </Label>
             <Input
+              disabled={loading}
               className="bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-500"
-              placeholder="e.g. Anthropic"
-              value={form.company}
-              onChange={(e) => setForm({ ...form, company: e.target.value })}
+              placeholder="e.g. Google"
+              value={form.employer}
+              onChange={(e) => setForm({ ...form, employer: e.target.value })}
             />
           </div>
 
@@ -109,10 +115,11 @@ export default function JobForm({
               Job Title *
             </Label>
             <Input
+              disabled={loading}
               className="bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-500"
-              placeholder="e.g. Senior Full Stack Engineer"
-              value={form.jobTitle}
-              onChange={(e) => setForm({ ...form, jobTitle: e.target.value })}
+              placeholder="e.g. Senior Site Reliability Engineer"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
             />
           </div>
 
@@ -121,8 +128,9 @@ export default function JobForm({
               Location
             </Label>
             <Input
+              disabled={loading}
               className="bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-500"
-              placeholder="e.g. San Francisco, CA or Remote"
+              placeholder="e.g. Mountain View, CA or Remote"
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
             />
@@ -130,59 +138,45 @@ export default function JobForm({
 
           <div className="flex flex-col gap-1.5">
             <Label className="text-zinc-300 text-xs font-semibold uppercase tracking-wider">
-              Job Posting URL *
+              Job Posting URL
             </Label>
             <Input
+              disabled={loading}
               className="bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-500"
               placeholder="https://..."
-              value={form.jobPostingUrl}
+              value={form.postingLink}
               onChange={(e) =>
-                setForm({ ...form, jobPostingUrl: e.target.value })
+                setForm({ ...form, postingLink: e.target.value })
               }
             />
           </div>
 
-          <div className="flex gap-4">
-            <div className="flex flex-col gap-1.5 flex-1">
-              <Label className="text-zinc-300 text-xs font-semibold uppercase tracking-wider">
-                Status
-              </Label>
-              <Select
-                value={form.status}
-                onValueChange={(val) =>
-                  setForm({ ...form, status: val as JobStatus })
-                }
-              >
-                <SelectTrigger className="bg-zinc-700 border-zinc-600 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                  {statusOptions.map((s) => (
-                    <SelectItem
-                      key={s}
-                      value={s}
-                      className="hover:bg-zinc-700 focus:bg-zinc-700"
-                    >
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex flex-col gap-1.5 flex-1">
-              <Label className="text-zinc-300 text-xs font-semibold uppercase tracking-wider">
-                Date Applied
-              </Label>
-              <Input
-                type="date"
-                className="bg-zinc-700 border-zinc-600 text-white"
-                value={form.dateApplied}
-                onChange={(e) =>
-                  setForm({ ...form, dateApplied: e.target.value })
-                }
-              />
-            </div>
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-zinc-300 text-xs font-semibold uppercase tracking-wider">
+              Application Status
+            </Label>
+            <Select
+              disabled={loading}
+              value={form.applicationStatus}
+              onValueChange={(val) =>
+                setForm({ ...form, applicationStatus: val as JobStatus })
+              }
+            >
+              <SelectTrigger className="bg-zinc-700 border-zinc-600 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                {statusOptions.map((s) => (
+                  <SelectItem
+                    key={s}
+                    value={s}
+                    className="hover:bg-zinc-700 focus:bg-zinc-700"
+                  >
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -190,25 +184,12 @@ export default function JobForm({
               Job Description
             </Label>
             <Textarea
+              disabled={loading}
               className="bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-500 min-h-28"
               placeholder="Paste the job description here..."
-              value={form.jobDescription}
+              value={form.description}
               onChange={(e) =>
-                setForm({ ...form, jobDescription: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label className="text-zinc-300 text-xs font-semibold uppercase tracking-wider">
-              Application Materials
-            </Label>
-            <Textarea
-              className="bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-500"
-              placeholder="e.g. Resume, cover letter, portfolio"
-              value={form.applicationMaterials}
-              onChange={(e) =>
-                setForm({ ...form, applicationMaterials: e.target.value })
+                setForm({ ...form, description: e.target.value })
               }
             />
           </div>
@@ -218,8 +199,9 @@ export default function JobForm({
               Notes
             </Label>
             <Textarea
+              disabled={loading}
               className="bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-500"
-              placeholder="Interview notes, follow-ups, contacts..."
+              placeholder="Interview notes, internal tracking context..."
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
             />
@@ -228,16 +210,18 @@ export default function JobForm({
           <div className="flex justify-end gap-2 pt-2">
             <Button
               variant="ghost"
+              disabled={loading}
               className="text-zinc-400 hover:text-white"
               onClick={() => onOpenChange(false)}
             >
               Cancel
             </Button>
             <Button
+              disabled={loading}
               className="bg-blue-600 hover:bg-blue-500 text-white"
               onClick={handleSubmit}
             >
-              {job ? "Save Changes" : "Add Job"}
+              {loading ? "Saving..." : job ? "Save Changes" : "Add Job"}
             </Button>
           </div>
         </div>
