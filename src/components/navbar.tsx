@@ -5,24 +5,11 @@ import { FileText, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
-import { useEffect } from "react";
 
 export default function Navbar() {
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user;
-
-  useEffect(() => {
-    if (!session) return;
-    const token = (session as any).idToken;
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/jobs`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((r) => r.text())
-      .then((data) => console.log("Jobs response:", data));
-  }, [session]);
 
   return (
     <nav className="w-full bg-zinc-900 border-b border-zinc-800 px-6 py-3 flex items-center justify-between sticky top-0 z-40">
